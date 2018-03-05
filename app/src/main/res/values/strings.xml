@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Foodapp</string>
+    <string-array name="btypes">
+        <item>All</item>
+        <item>Distributors/Transporters</item>
+        <item>Farmers/growers</item>
+        <item>Hospitals/Childcare/Caring Premises</item>
+        <item>Hotel/bed and breakfast/guest house</item>
+        <item>Importers/Exporters</item>
+        <item>Manufacturers/packers</item>
+        <item>Mobile caterer</item>
+        <item>Other catering premises</item>
+        <item>Pub/bar/nightclub</item>
+        <item>Restaurant/Cafe/Canteen</item>
+        <item>Retailers - other</item>
+        <item>Retailers - supermarkets/hypermarkets</item>
+        <item>School/college/university</item>
+        <item>Takeaway/sandwich shop</item>
+    </string-array>
+
+</resources>
