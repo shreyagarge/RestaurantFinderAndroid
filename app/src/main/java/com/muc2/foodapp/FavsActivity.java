@@ -1,20 +1,17 @@
 package com.muc2.foodapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +28,9 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
 
+import static android.os.Build.ID;
 
-/**
- * Created by shreyagarge on 2/28/18.
- */
-
-public class SimpleSearch extends AppCompatActivity {
+public class FavsActivity extends AppCompatActivity {
     private Object id1;
     private String id;
     private String BusinessName;
@@ -51,61 +45,25 @@ public class SimpleSearch extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.simple_search);
-
-        // Set the three navigation buttons
-        Button btn1 = findViewById(R.id.button);
-        if (btn1 != null) {
-            btn1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(SimpleSearch.this, SearchPage.class));
-                }
-            });
+        setContentView(R.layout.activity_favs);
+        table = (TableLayout) findViewById(R.id.table_location2);
+        if (table != null) {
+            table.removeAllViews();
         }
-        Button btn2 = findViewById(R.id.button2);
-        if (btn2 != null) {
-            btn2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(SimpleSearch.this, SimpleSearch.class));
-                }
-            });
+        String addednames="";
+        sharedPref = getSharedPreferences("AB",Context.MODE_PRIVATE);
+        Map<String,?> entries = sharedPref.getAll();
+        Set<String> keys = entries.keySet();
+        int i=0;
+        for (String key : keys) {
+
+            String name = sharedPref.getString(key,"");
+            if(!addednames.contains(name)) {
+                addednames = addednames + name;
+                get_locations(name);
+            }
         }
-        Button btn3 = findViewById(R.id.button3);
-        if (btn3 != null) {
-            btn3.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(SimpleSearch.this, AdvSearch.class));
-                }
-            });
-        }
-        sharedPref = this.getSharedPreferences("AB",Context.MODE_PRIVATE);
-    }
 
-    public void subm(View view) {
-        Context context = getApplicationContext();
-        CharSequence text = "sending request for establishments";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-        String input;
-        // The TextBox where the user enters in the name to search for
-        EditText userInput = (EditText) findViewById(R.id.editText);
-        if (userInput != null) {
-
-            // Clear any error message if it exists
-            TextView error = (TextView) findViewById(R.id.error);
-            if (error != null) { error.setText(""); }
-
-            // Get the user inputted text
-            input = userInput.getText().toString();
-
-            // Pass the user input to the method to get the locations
-            get_locations(input);
-        }
     }
 
     private void get_locations(String input) {
@@ -119,8 +77,9 @@ public class SimpleSearch extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
 
             // Using URLEncoder to ensure that spaces are properly formatted and the entire query is passed in
+
             String query = URLEncoder.encode(input);
-            String address = "http://api.ratings.food.gov.uk/Establishments?name="+query+"&pagesize=20";
+            String address = "http://api.ratings.food.gov.uk/Establishments?name="+query+"&pagesize=1";
 
             try {
                 URL url = new URL(address);
@@ -139,10 +98,11 @@ public class SimpleSearch extends AppCompatActivity {
                 responseBody=responseBody.replace("FHRSID","id");
                 ins.close();
                 in.close();
+
                 // we should now have one big string with the entire fetched resource
 
                 // If there are no results, inform the user
-                if (responseBody.startsWith("[]")) {
+                if (responseBody.equals("[]")) {
                     TextView error = (TextView) findViewById(R.id.error);
                     if (error != null) {
                         error.setText("The query did not return any results");
@@ -176,8 +136,6 @@ public class SimpleSearch extends AppCompatActivity {
             }
         }
     }
-
-
     private void parseJSON(String responseBody) {
         try {
 
@@ -185,10 +143,7 @@ public class SimpleSearch extends AppCompatActivity {
             JSONArray data = new JSONArray(responseBody);
 
             // Table where the results will be displayed, first remove the previous results
-            table = (TableLayout) findViewById(R.id.table_location);
-            if (table != null) {
-                table.removeAllViews();
-            }
+
 
             // Loops through all the results in the JSON array, extracts the relevant fields
             // and then invokes the table method where the rows are added
@@ -196,6 +151,7 @@ public class SimpleSearch extends AppCompatActivity {
                 id1 = data.getJSONObject(i).get("id");
                 id = id1.toString();
                 BusinessName = data.getJSONObject(i).getString("BusinessName");
+
                 if (BusinessName.length() > 25) {
                     BusinessName = BusinessName.substring(0, 25) + "...";
                 }
@@ -280,18 +236,8 @@ public class SimpleSearch extends AppCompatActivity {
         TextView address2 = new TextView(this);
         address2.setText(AddressLine2);
         tr3.addView(address2);
-        ImageView fav = new ImageView(this);
-        try{
-            InputStream stream2 = getAssets().open("favico.png");
-            Drawable d2 = Drawable.createFromStream(stream2,null);
-            fav.setImageDrawable(d2);
-            stream2.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-        tr3.addView(fav);
-        tr3.setTag(BusinessName);
-        tr3.setOnClickListener(tableRowOnClickListener2);
+
+        //tr3.setOnClickListener(tableRowOnClickListener2);
         // Add the rows to the table
         table.addView(tr1);
         table.addView(tr2);
@@ -320,32 +266,5 @@ public class SimpleSearch extends AppCompatActivity {
         // Padding the left of the table to bring it away from the edge
         // Padding the bottom of the table because otherwise the last row is obscured
         table.setPadding(20, 0, 0, 50);
-    }
-    private View.OnClickListener tableRowOnClickListener2 = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int i;
-            sharedPref = getSharedPreferences("AB",Context.MODE_PRIVATE);
-            Map<String,?> entries = sharedPref.getAll();
-            Set<String> keys = entries.keySet();
-            i=keys.size();
-            String thiskey = "fav"+Integer.toString(i+1);
-            String nametofav = v.getTag().toString();
-
-            Context context = getApplicationContext();
-            CharSequence text = nametofav+" added to favorites";
-            int duration = Toast.LENGTH_LONG;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(thiskey,nametofav);
-            editor.commit();
-
-        }
-    };
-    public void viewfav(View view){
-        Intent intent = new Intent(SimpleSearch.this, FavsActivity.class);
-        startActivity(intent);
     }
 }

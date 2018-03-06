@@ -2,6 +2,7 @@ package com.muc2.foodapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -16,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +29,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
+import java.util.Set;
 
 public class AdvSearch extends AppCompatActivity {
     private String id;
@@ -38,6 +42,7 @@ public class AdvSearch extends AppCompatActivity {
     private String RatingValue;
     private String responseBody;
     private TableLayout table;
+    private SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +75,7 @@ public class AdvSearch extends AppCompatActivity {
                 }
             });
         }
+        sharedPref = this.getSharedPreferences("AB",Context.MODE_PRIVATE);
     }
 
     public void submit_onClick(View view) {
@@ -151,10 +157,10 @@ public class AdvSearch extends AppCompatActivity {
             // Using URLEncoder to ensure that spaces are properly formatted and the entire query is passed in
             //String query = URLEncoder.encode(input);
             if(chk==1) {
-                address = "http://api.ratings.food.gov.uk/Establishments?ratingkey=" + input + "&pagesize=15";
+                address = "http://api.ratings.food.gov.uk/Establishments?ratingkey=" + input + "&pagenumber=10&pagesize=15";
             }
             if(chk==2){
-                address = "http://api.ratings.food.gov.uk/Establishments?BusinessTypeId=" + input +"&pagesize=15";
+                address = "http://api.ratings.food.gov.uk/Establishments?BusinessTypeId=" + input +"&pagenumber=10&pagesize=15";
             }
             try {
                 URL url = new URL(address);
@@ -176,7 +182,7 @@ public class AdvSearch extends AppCompatActivity {
                 // we should now have one big string with the entire fetched resource
 
                 // If there are no results, inform the user
-                if (responseBody.equals("[]")) {
+                if (responseBody.startsWith("[]")) {
                     TextView error = (TextView) findViewById(R.id.error);
                     if (error != null) {
                         error.setText("error");
@@ -187,7 +193,7 @@ public class AdvSearch extends AppCompatActivity {
                 if (!responseBody.startsWith("[")) {
                     TextView error = (TextView) findViewById(R.id.error);
                     if (error != null) {
-                        error.setText(responseBody);
+                        error.setText("Invalid response from API");
                         error.setTextAppearance(this, R.style.Error);
                     }
                 }
@@ -203,6 +209,11 @@ public class AdvSearch extends AppCompatActivity {
             }
         } else {
             // display error
+            TextView error = (TextView) findViewById(R.id.error);
+            if (error != null) {
+                error.setText("invalid or empty response from API");
+                error.setTextAppearance(this, R.style.Error);
+            }
         }
     }
 
@@ -306,7 +317,18 @@ public class AdvSearch extends AppCompatActivity {
         TextView address2 = new TextView(this);
         address2.setText(AddressLine2);
         tr3.addView(address2);
-
+        ImageView fav = new ImageView(this);
+        try{
+            InputStream stream2 = getAssets().open("favico.png");
+            Drawable d2 = Drawable.createFromStream(stream2,null);
+            fav.setImageDrawable(d2);
+            stream2.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        tr3.addView(fav);
+        tr3.setTag(BusinessName);
+        tr3.setOnClickListener(tableRowOnClickListener2);
         // Add the rows to the table
         table.addView(tr1);
         table.addView(tr2);
@@ -337,6 +359,34 @@ public class AdvSearch extends AppCompatActivity {
         table.setPadding(20, 0, 0, 50);
     }
 
+    private View.OnClickListener tableRowOnClickListener2 = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int i;
+            sharedPref = getSharedPreferences("AB",Context.MODE_PRIVATE);
+            Map<String,?> entries = sharedPref.getAll();
+            Set<String> keys = entries.keySet();
+            i=keys.size();
+            String thiskey = "fav"+Integer.toString(i+1);
+            String nametofav = v.getTag().toString();
+            nametofav=nametofav.replaceAll("/^[a-zA-Z ]*$/", "").toLowerCase();
 
+            Context context = getApplicationContext();
+            CharSequence text = nametofav+" added to favorites";
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(thiskey,nametofav);
+            editor.commit();
+
+        }
+    };
+
+    public void viewfav(View view){
+        Intent intent = new Intent(AdvSearch.this, FavsActivity.class);
+        startActivity(intent);
+    }
 
 }

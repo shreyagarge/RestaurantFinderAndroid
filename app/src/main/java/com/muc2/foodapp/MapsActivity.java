@@ -23,12 +23,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String SelectedID;
     private ArrayList<String[]> allCoordinates = new ArrayList<>();
 
-    /**
-     * Method called when the MapsActivity first starts
-     * It gets the data from the Intent Extra, extracts the relevant details and
-     * puts them into an array to used in the onMapReady method
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String rating       = data.getJSONObject(i).getString("RatingValue");
                     String ratingDate   = data.getJSONObject(i).getString("RatingDate");
                     String idFromArray  = data.getJSONObject(i).getString("id");
+
 
                     // The data needed for the markers is stored in an arrayList of arrays
                     latlon[0] = latitude;

@@ -21,16 +21,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".SimpleSearch" />
-        <activity android:name=".AdvSearch"></activity>
-        <activity
-            android:name=".MapsActivity">
+        <activity android:name=".AdvSearch" />
+        <activity android:name=".MapsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.muc2.foodapp.SearchPage" />
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
+        <activity android:name=".FavsActivity"></activity>
     </application>
 
 </manifest>

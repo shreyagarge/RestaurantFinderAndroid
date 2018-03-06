@@ -8,7 +8,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-        resValue "string", "google_maps_key","AIzaSyDtQ7gXvuL7sGkYL7oNLJrqOwcb9YAULPY"
+        resValue "string", "google_maps_key", "AIzaSyDtQ7gXvuL7sGkYL7oNLJrqOwcb9YAULPY"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

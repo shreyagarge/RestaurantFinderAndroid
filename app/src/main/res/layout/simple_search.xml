@@ -40,13 +40,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="7dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="2dp"
         android:fillViewport="true"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/submitbu">
+        app:layout_constraintTop_toBottomOf="@+id/button4">
 
         <TableLayout
             android:id="@+id/table_location"
@@ -62,7 +62,6 @@
         android:id="@+id/editText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="14dp"
         android:layout_marginStart="14dp"
         android:ems="10"
@@ -70,29 +69,45 @@
         android:lineSpacingExtra="8sp"
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/Scroller"
+        app:layout_constraintBottom_toTopOf="@+id/button4"
         app:layout_constraintEnd_toStartOf="@+id/submitbu"
-        app:layout_constraintStart_toStartOf="@+id/Scroller" />
+        app:layout_constraintStart_toStartOf="@+id/button" />
 
     <Button
         android:id="@+id/submitbu"
         android:layout_width="wrap_content"
         android:layout_height="42dp"
+        android:layout_marginBottom="38dp"
         android:layout_marginEnd="13dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="56dp"
         android:onClick="subm"
         android:text="Submit"
+        app:layout_constraintBottom_toTopOf="@+id/Scroller"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintTop_toTopOf="@+id/button3" />
 
     <TextView
         android:id="@+id/error"
         android:layout_width="0dp"
         android:layout_height="30dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="220dp"
         android:text=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Scroller" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="206dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="107dp"
+
+        android:layout_marginTop="105dp"
+        android:onClick="viewfav"
+        android:text="view favorites"
+        app:layout_constraintBottom_toBottomOf="@+id/error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

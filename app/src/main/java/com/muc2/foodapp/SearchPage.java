@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -37,6 +38,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
+import java.util.Set;
 
 public class SearchPage extends AppCompatActivity {
     private final int FINE_LOCATION_PERMISSION = 1;
@@ -51,6 +54,7 @@ public class SearchPage extends AppCompatActivity {
     private String PostCode;
     private String RatingValue;
     private String Distance;
+    private SharedPreferences sharedPref;
 
     LocationListener loclis;
     LocationManager locMan;
@@ -86,7 +90,8 @@ public class SearchPage extends AppCompatActivity {
                 }
             });
         }
-        ((TextView) findViewById(R.id.textView)).setText("Searching by location");
+        sharedPref = this.getSharedPreferences("AB",Context.MODE_PRIVATE);
+        ((TextView) findViewById(R.id.textView)).setText("click local Search, then search button");
         Context context = this.getApplicationContext();
         locMan = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         //get coordinates
@@ -194,14 +199,21 @@ public class SearchPage extends AppCompatActivity {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             HttpURLConnection urlConnection = null;
-
+//            if (latitude.isEmpty() && longitude.isEmpty()){
+//                Context context = getApplicationContext();
+//                CharSequence text = "sorry! please click the local search button and then click the search icon again";
+//                int duration = Toast.LENGTH_SHORT;
+//
+//                Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
+//            }
             String address = "http://sandbox.kriswelsh.com/hygieneapi/hygiene.php?op=s_loc&lat=" + latitude + "&long=" + longitude;
-            Context context = getApplicationContext();
-            CharSequence text = "fetching results from FSA API";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+//            Context context = getApplicationContext();
+//            CharSequence text = "fetching results from FSA API";
+//            int duration = Toast.LENGTH_SHORT;
+//
+//            Toast toast = Toast.makeText(context, text, duration);
+//            toast.show();
 
             try {
                 URL url = new URL(address);
@@ -229,6 +241,11 @@ public class SearchPage extends AppCompatActivity {
             }
         } else {
             // display error
+            TextView error = (TextView) findViewById(R.id.error);
+            if (error != null) {
+                error.setText("invalid or empty response from API");
+                error.setTextAppearance(this, R.style.Error);
+            }
         }
     }
 
@@ -287,6 +304,12 @@ public class SearchPage extends AppCompatActivity {
         } catch (JSONException je) {
             je.printStackTrace();
         }
+        Context context = getApplicationContext();
+        CharSequence text = "Click on the establishment name for map view";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     private static String round(String value) {
@@ -349,7 +372,18 @@ public class SearchPage extends AppCompatActivity {
         TextView address2 = new TextView(this);
         address2.setText(AddressLine2);
         tr3.addView(address2);
-
+        ImageView fav = new ImageView(this);
+        try{
+            InputStream stream2 = getAssets().open("favico.png");
+            Drawable d2 = Drawable.createFromStream(stream2,null);
+            fav.setImageDrawable(d2);
+            stream2.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        tr3.addView(fav);
+        tr3.setTag(BusinessName);
+        tr3.setOnClickListener(tableRowOnClickListener2);
         // Add the rows to the table
         table.addView(tr1);
         table.addView(tr2);
@@ -378,6 +412,8 @@ public class SearchPage extends AppCompatActivity {
         // Padding the left of the table to bring it away from the edge
         // Padding the bottom of the table because otherwise the last row is obscured
         table.setPadding(20, 0, 0, 50);
+
+
     }
 
     private View.OnClickListener tableRowOnClickListener = new View.OnClickListener() {
@@ -395,5 +431,33 @@ public class SearchPage extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener tableRowOnClickListener2 = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int i;
+            sharedPref = getSharedPreferences("AB",Context.MODE_PRIVATE);
+            Map<String,?> entries = sharedPref.getAll();
+            Set<String> keys = entries.keySet();
+            i=keys.size();
+            String thiskey = "fav"+Integer.toString(i+1);
+            String nametofav = v.getTag().toString();
 
+            Context context = getApplicationContext();
+            CharSequence text = nametofav+" added to favorites";
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(thiskey,nametofav);
+            editor.commit();
+
+        }
+    };
+
+    public void viewfav(View view){
+
+        Intent intent = new Intent(SearchPage.this, FavsActivity.class);
+        startActivity(intent);
+    }
 }
