@@ -330,16 +330,16 @@ public class SimpleSearch extends AppCompatActivity {
             Set<String> keys = entries.keySet();
             i=keys.size();
             String thiskey = "fav"+Integer.toString(i+1);
-            String nametofav = v.getTag().toString();
+            String esttofav = v.getTag().toString();
 
             Context context = getApplicationContext();
-            CharSequence text = nametofav+" added to favorites";
+            CharSequence text = esttofav+" added to favorites";
             int duration = Toast.LENGTH_LONG;
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(thiskey,nametofav);
+            editor.putString(thiskey,esttofav);
             editor.commit();
 
         }

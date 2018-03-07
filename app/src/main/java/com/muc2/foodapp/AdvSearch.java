@@ -114,7 +114,7 @@ public class AdvSearch extends AppCompatActivity {
                 break;
             case "Hospitals/Childcare/Caring Premises" : inpid = 5;
                 break;
-            case "Hotel/bed & breakfast/guest house" : inpid = 7842;
+            case "Hotel/bed and breakfast/guest house" : inpid = 7842;
                 break;
             case "Importers/Exporters" : inpid = 14;
                 break;
@@ -185,7 +185,7 @@ public class AdvSearch extends AppCompatActivity {
                 if (responseBody.startsWith("[]")) {
                     TextView error = (TextView) findViewById(R.id.error);
                     if (error != null) {
-                        error.setText("error");
+                        error.setText("Search returned no results");
                         error.setTextAppearance(this, R.style.Error);
                     }
                 }

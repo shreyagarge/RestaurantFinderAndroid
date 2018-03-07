@@ -1,6 +1,7 @@
 package com.muc2.foodapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -8,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -22,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -42,6 +45,7 @@ public class FavsActivity extends AppCompatActivity {
     private String responseBody;
     private TableLayout table;
     private SharedPreferences sharedPref;
+    private String curKey;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +60,22 @@ public class FavsActivity extends AppCompatActivity {
         Set<String> keys = entries.keySet();
         int i=0;
         for (String key : keys) {
-
+            curKey = key;
             String name = sharedPref.getString(key,"");
+
             if(!addednames.contains(name)) {
                 addednames = addednames + name;
                 get_locations(name);
             }
         }
+
+    }
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        startActivity(new Intent(FavsActivity.this, SearchPage.class));
+        finish();
 
     }
 
@@ -79,6 +92,7 @@ public class FavsActivity extends AppCompatActivity {
             // Using URLEncoder to ensure that spaces are properly formatted and the entire query is passed in
 
             String query = URLEncoder.encode(input);
+            //String query2 = URLEncoder.encode(input2,"UTF-8");
             String address = "http://api.ratings.food.gov.uk/Establishments?name="+query+"&pagesize=1";
 
             try {
@@ -236,7 +250,18 @@ public class FavsActivity extends AppCompatActivity {
         TextView address2 = new TextView(this);
         address2.setText(AddressLine2);
         tr3.addView(address2);
-
+        ImageView fav = new ImageView(this);
+        try{
+            InputStream stream2 = getAssets().open("favrem.png");
+            Drawable d2 = Drawable.createFromStream(stream2,null);
+            fav.setImageDrawable(d2);
+            stream2.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        tr3.addView(fav);
+        tr3.setTag(curKey);
+        tr3.setOnClickListener(tableRowOnClickListener3);
         //tr3.setOnClickListener(tableRowOnClickListener2);
         // Add the rows to the table
         table.addView(tr1);
@@ -267,4 +292,25 @@ public class FavsActivity extends AppCompatActivity {
         // Padding the bottom of the table because otherwise the last row is obscured
         table.setPadding(20, 0, 0, 50);
     }
+
+    private View.OnClickListener tableRowOnClickListener3 = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int i;
+            sharedPref = getSharedPreferences("AB",Context.MODE_PRIVATE);
+            String keytorem = v.getTag().toString();
+            String nm = sharedPref.getString(keytorem,"");
+            Context context = getApplicationContext();
+            CharSequence text = nm+" removed from favorites";
+            int duration = Toast.LENGTH_LONG;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.remove(keytorem);
+            editor.commit();
+            Intent intent = new Intent(FavsActivity.this, FavsActivity.class);
+            startActivity(intent);
+        }
+    };
 }

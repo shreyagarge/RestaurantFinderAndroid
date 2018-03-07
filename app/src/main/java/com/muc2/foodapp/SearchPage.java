@@ -199,17 +199,18 @@ public class SearchPage extends AppCompatActivity {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             HttpURLConnection urlConnection = null;
-//            if (latitude.isEmpty() && longitude.isEmpty()){
-//                Context context = getApplicationContext();
-//                CharSequence text = "sorry! please click the local search button and then click the search icon again";
-//                int duration = Toast.LENGTH_SHORT;
-//
-//                Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
-//            }
+            if (latitude==null && longitude==null){
+                Context context = getApplicationContext();
+                CharSequence text = "failed to locate you! returning a default list of establishments. please check your gps connection, enable location, and click the local search button and then the search icon again";
+                int duration = Toast.LENGTH_LONG;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+
+            }
             String address = "http://sandbox.kriswelsh.com/hygieneapi/hygiene.php?op=s_loc&lat=" + latitude + "&long=" + longitude;
 //            Context context = getApplicationContext();
-//            CharSequence text = "fetching results from FSA API";
+//            CharSequence text = address;
 //            int duration = Toast.LENGTH_SHORT;
 //
 //            Toast toast = Toast.makeText(context, text, duration);
